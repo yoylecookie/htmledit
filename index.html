@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Prism default colors -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #editor {
+            position: relative;
+            width: 50vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #highlight,
+        #input {
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            margin: 0;
+            padding: 4px;
+
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.2;
+
+            white-space: pre;
+            tab-size: 4;
+        }
+
+        #highlight {
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        #highlight code {
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+        }
+
+        #input {
+            resize: none;
+            overflow: auto;
+
+            background: transparent;
+            color: transparent;
+            caret-color: black;
+
+            outline: none;
+        }
+
+        #preview {
+            width: 50vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="container">
+
+    <div id="editor">
+
+        <pre id="highlight"><code></code></pre>
+
+        <textarea
+            id="input"
+            spellcheck="false"
+        ></textarea>
+
+    </div>
+
+    <iframe id="preview"></iframe>
+
+</div>
+
+<script>
+const input = document.getElementById("input");
+const highlight = document.getElementById("highlight");
+const highlightCode = document.querySelector("#highlight code");
+const preview = document.getElementById("preview");
+
+function update() {
+    const code = input.value;
+
+    // Update syntax highlighting
+    highlightCode.innerHTML =
+        Prism.highlight(
+            code,
+            Prism.languages.markup,
+            "markup"
+        );
+
+    // Update live preview
+    preview.srcdoc = code;
+
+    // Keep highlighting synchronized with textarea
+    highlight.scrollTop = input.scrollTop;
+    highlight.scrollLeft = input.scrollLeft;
+}
+
+input.addEventListener("input", update);
+
+input.addEventListener("scroll", () => {
+    highlight.scrollTop = input.scrollTop;
+    highlight.scrollLeft = input.scrollLeft;
+});
+
+input.value = `<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Page Title</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+    body {
+        
+    }
+</style>
+<body>
+
+<script>
+<\/script>
+</body>
+</html>`;
+
+update();
+</script>
+
+</body>
+</html>
