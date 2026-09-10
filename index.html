@@ -9,7 +9,7 @@
           type="image/png"
           href="https://www.rw-designer.com/icon-image/14290-48x48x32.png">
 
-    <!-- Prism default colors -->
+    <!-- Prism -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.css">
 
@@ -21,7 +21,8 @@
             box-sizing: border-box;
         }
 
-        html, body {
+        html,
+        body {
             margin: 0;
             width: 100%;
             height: 100%;
@@ -41,7 +42,52 @@
             overflow: hidden;
         }
 
-        #highlight,
+        #highlight {
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+
+            margin: 0;
+            padding: 4px;
+
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 1.2;
+
+            letter-spacing: normal;
+            word-spacing: normal;
+
+            white-space: pre;
+            tab-size: 4;
+
+            pointer-events: none;
+
+            background: white;
+            color: black;
+
+            z-index: 1;
+
+            transform: translate(0, 0);
+        }
+
+        #highlight code {
+            display: block;
+
+            margin: 0;
+            padding: 0;
+
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 1.2;
+
+            white-space: pre;
+            background: transparent;
+        }
+
         #input {
             position: absolute;
             top: 0;
@@ -55,35 +101,28 @@
 
             font-family: monospace;
             font-size: 12px;
+            font-weight: normal;
             line-height: 1.2;
+
+            letter-spacing: normal;
+            word-spacing: normal;
 
             white-space: pre;
             tab-size: 4;
-        }
-
-        #highlight {
-            z-index: 1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        #highlight code {
-            font-family: inherit;
-            font-size: inherit;
-            line-height: inherit;
-        }
-
-        #input {
-            z-index: 2;
 
             resize: none;
             overflow: auto;
 
             background: transparent;
+
             color: transparent;
+            -webkit-text-fill-color: transparent;
+
             caret-color: black;
 
             outline: none;
+
+            z-index: 2;
         }
 
         #preview {
@@ -143,7 +182,11 @@ const defaultCode = `<!DOCTYPE html>
 </body>
 </html>`;
 
-// Load saved code, or use the default code
+
+/*
+    Load saved code
+*/
+
 const savedCode = localStorage.getItem(STORAGE_KEY);
 
 if (savedCode !== null) {
@@ -152,33 +195,73 @@ if (savedCode !== null) {
     input.value = defaultCode;
 }
 
+
+/*
+    Update highlighting, preview,
+    and scrolling.
+*/
+
 function update() {
+
     const code = input.value;
 
-    // Save code locally
+    /*
+        Save
+    */
+
     localStorage.setItem(STORAGE_KEY, code);
 
-    // Syntax highlighting
+
+    /*
+        Highlight
+    */
+
     highlightCode.innerHTML = Prism.highlight(
         code,
         Prism.languages.markup,
         "markup"
     );
 
-    // Live preview
+
+    /*
+        Preview
+    */
+
     preview.srcdoc = code;
 
-    // Keep highlighting synchronized with textarea
-    highlight.scrollTop = input.scrollTop;
-    highlight.scrollLeft = input.scrollLeft;
+
+    /*
+        Move highlighting exactly
+        opposite the textarea's scroll.
+    */
+
+    highlight.style.transform =
+        `translate(${-input.scrollLeft}px, ${-input.scrollTop}px)`;
 }
+
+
+/*
+    Typing
+*/
 
 input.addEventListener("input", update);
 
+
+/*
+    Scrolling
+*/
+
 input.addEventListener("scroll", () => {
-    highlight.scrollTop = input.scrollTop;
-    highlight.scrollLeft = input.scrollLeft;
+
+    highlight.style.transform =
+        `translate(${-input.scrollLeft}px, ${-input.scrollTop}px)`;
+
 });
+
+
+/*
+    Initial update
+*/
 
 update();
 </script>
