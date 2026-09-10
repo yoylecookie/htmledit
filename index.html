@@ -5,11 +5,13 @@
     <title>HTML Editor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <link rel="icon"
+          type="image/png"
+          href="https://www.rw-designer.com/icon-image/14290-48x48x32.png">
+
     <!-- Prism default colors -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.css">
-    <link rel="icon" type="image/png"
-      href="https://www.rw-designer.com/icon-image/14290-48x48x32.png">
 
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
@@ -60,6 +62,7 @@
         }
 
         #highlight {
+            z-index: 1;
             overflow: hidden;
             pointer-events: none;
         }
@@ -71,6 +74,8 @@
         }
 
         #input {
+            z-index: 2;
+
             resize: none;
             overflow: auto;
 
@@ -99,6 +104,9 @@
         <textarea
             id="input"
             spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
         ></textarea>
 
     </div>
@@ -113,18 +121,51 @@ const highlight = document.getElementById("highlight");
 const highlightCode = document.querySelector("#highlight code");
 const preview = document.getElementById("preview");
 
+const STORAGE_KEY = "html-editor-code";
+
+const defaultCode = `<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Page Title</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+    body {
+        
+    }
+</style>
+
+<body>
+
+<script>
+<\/script>
+
+</body>
+</html>`;
+
+// Load saved code, or use the default code
+const savedCode = localStorage.getItem(STORAGE_KEY);
+
+if (savedCode !== null) {
+    input.value = savedCode;
+} else {
+    input.value = defaultCode;
+}
+
 function update() {
     const code = input.value;
 
-    // Update syntax highlighting
-    highlightCode.innerHTML =
-        Prism.highlight(
-            code,
-            Prism.languages.markup,
-            "markup"
-        );
+    // Save code locally
+    localStorage.setItem(STORAGE_KEY, code);
 
-    // Update live preview
+    // Syntax highlighting
+    highlightCode.innerHTML = Prism.highlight(
+        code,
+        Prism.languages.markup,
+        "markup"
+    );
+
+    // Live preview
     preview.srcdoc = code;
 
     // Keep highlighting synchronized with textarea
@@ -138,23 +179,6 @@ input.addEventListener("scroll", () => {
     highlight.scrollTop = input.scrollTop;
     highlight.scrollLeft = input.scrollLeft;
 });
-
-input.value = `<!DOCTYPE html>
-<html lang="en">
-<meta charset="UTF-8">
-<title>Page Title</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-    body {
-        
-    }
-</style>
-<body>
-
-<script>
-<\/script>
-</body>
-</html>`;
 
 update();
 </script>
